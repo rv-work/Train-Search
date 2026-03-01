@@ -9,7 +9,7 @@ The **Train Search Platform** is a web-based application that allows users to se
 
 ## 🌟 Features
 
-- 🔍 **Train Search**: Find direct and multi-train routes between stations.
+- 🔍 **Train Search**:. Find direct and multi-train routes between stations.
 - 🔄 **Multi-Train Route Optimization**: Automatically suggests the best possible route with multiple trains if no direct train is available.
 - 🏷 **Seat Availability**: Displays available seats for each train option.
 - ⏳ **Estimated Travel Time**: Provides an estimated duration for the selected route.
