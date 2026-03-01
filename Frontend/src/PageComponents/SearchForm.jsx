@@ -16,23 +16,25 @@ const SearchForm = () => {
     mode,
     date,
     setError,
-    isSearching , 
-    setIsSearching
+    isSearching,
+    setIsSearching,
   } = useContext(context);
-
 
   const handleSearch = async () => {
     setError("");
 
     if (!mode) return setError("Please select a mode.");
     if (["Bus Only", "Flight Only", "Mixed Mode"].includes(mode)) {
-      return setError(`${mode} services are under development. Try other services.`);
+      return setError(
+        `${mode} services are under development. Try other services.`,
+      );
     }
-    if (!fromStation.station_code) return setError("Please select a source station.");
-    if (!toStation.station_code) return setError("Please select a destination station.");
+    if (!fromStation.station_code)
+      return setError("Please select a source station.");
+    if (!toStation.station_code)
+      return setError("Please select a destination station.");
     if (!date) return setError("Please select a date.");
 
-   
     setIsSearching(true);
     setLoading(true);
     setSearch(true);
@@ -40,7 +42,7 @@ const SearchForm = () => {
     setDirect([]);
     setMulti([]);
     const eventSource = new EventSource(
-      `https://train-ticket-rmn1.onrender.com/api/trains/search-trains?fromStation=${fromStation.station_code}&toStation=${toStation.station_code}`
+      `http://localhost:2100/api/trains/search-trains?fromStation=${fromStation.station_code}&toStation=${toStation.station_code}`,
     );
 
     eventSource.onmessage = (event) => {
@@ -74,10 +76,33 @@ const SearchForm = () => {
 
   return (
     <div className="flex flex-col sm:flex-row sm:gap-4 gap-2 items-stretch">
-      <Input placeholder={"Train Only"} label={"Mode"} type={"select"} options={modeOptions} round={"left"} className="flex-1" />
-      <Input placeholder={"City, place, location"} type={"text"} label={"From"} className="flex-1" />
-      <Input placeholder={"City, place, location"} type={"text"} label={"To"} className="flex-1" />
-      <Input placeholder={"Select Date"} label={"Date"} type={"date"} round={"right"} className="flex-1" />
+      <Input
+        placeholder={"Train Only"}
+        label={"Mode"}
+        type={"select"}
+        options={modeOptions}
+        round={"left"}
+        className="flex-1"
+      />
+      <Input
+        placeholder={"City, place, location"}
+        type={"text"}
+        label={"From"}
+        className="flex-1"
+      />
+      <Input
+        placeholder={"City, place, location"}
+        type={"text"}
+        label={"To"}
+        className="flex-1"
+      />
+      <Input
+        placeholder={"Select Date"}
+        label={"Date"}
+        type={"date"}
+        round={"right"}
+        className="flex-1"
+      />
       <button
         onClick={handleSearch}
         disabled={isSearching}

@@ -24,9 +24,9 @@ async function buildStationGraph() {
 
     const allStations = [startingStation, ...intermediateStations, terminatingStation];
 
+    // ✅ FIXED LOGIC: Har station ko uske aage aane wale saare stations se connect karein
     for (let i = 0; i < allStations.length - 1; i++) {
       const currentStation = allStations[i];
-      const nextStation = allStations[i + 1];
 
       if (!graph[currentStation]) {
         graph[currentStation] = {
@@ -35,37 +35,42 @@ async function buildStationGraph() {
         };
       }
 
-      let connection = graph[currentStation].stations_connected.find(conn => conn.station === nextStation);
+      for (let j = i + 1; j < allStations.length; j++) {
+        const nextStation = allStations[j];
 
-      if (!connection) {
-        connection = {
-          station: nextStation,
-          trains: [train.train_number],
-          connection_count: 1
-        };
-        graph[currentStation].stations_connected.push(connection);
-      } else {
-        connection.trains.push(train.train_number);
-        connection.connection_count += 1;
+        if (currentStation === nextStation) continue; // Prevent self-loop
+
+        let connection = graph[currentStation].stations_connected.find(conn => conn.station === nextStation);
+
+        if (!connection) {
+          connection = {
+            station: nextStation,
+            trains: [train.train_number],
+            connection_count: 1
+          };
+          graph[currentStation].stations_connected.push(connection);
+        } else {
+          // Avoid duplicate trains
+          if (!connection.trains.includes(train.train_number)) {
+            connection.trains.push(train.train_number);
+            connection.connection_count += 1;
+          }
+        }
       }
     }
   });
 
+  // Purana Graph delete kar rahe hain taaki naya fresh data jaaye
+  await StationGraph.deleteMany({});
+  console.log("Old graph cleared.");
+
   for (const stationCode in graph) {
     const stationData = graph[stationCode];
-
-    let stationRecord = await StationGraph.findOne({ station_code: stationCode });
-
-    if (!stationRecord) {
-      stationRecord = new StationGraph(stationData);
-    } else {
-      stationRecord.stations_connected = stationData.stations_connected;
-    }
-
+    const stationRecord = new StationGraph(stationData);
     await stationRecord.save();
   }
 
-  console.log('Station graph built and saved to MongoDB.');
+  console.log('✅ New Optimized Station graph built and saved to MongoDB.');
 }
 
 connectDB().then(() => {
